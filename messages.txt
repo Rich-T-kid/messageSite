@@ -1,0 +1,124 @@
+data = {
+
+    message1{
+        id: 1,
+        message : "Style never met and those among great. At no or september sportsmen he perfectly happiness attending. Depending listening delivered off new she procuring satisfied sex existence. Person plenty answer to exeter it if. Law use assistance especially resolution cultivated did out sentiments unsatiable. Way necessary had intention happiness but september delighted his curiosity. Furniture furnished or on strangers neglected remainder engrossed."
+        date_sent: 2023-05-09
+        text_size : 443
+        rec_id : 2
+    }
+     message2{
+        id: 2,
+        message : "Eat imagine you chiefly few end ferrars compass. Be visitor females am ferrars inquiry. Latter law remark two lively thrown. Spot set they know rest its. Raptures law diverted believed jennings consider children the see. Had invited beloved carried the colonel. Occasional principles discretion it as he unpleasing boisterous. She bed sing dear now son half."
+        date_sent: 2023-08-07
+        text_size : 56
+        rec_id : 8
+    }
+     message3{
+        id: 5,
+        message : "Admiration stimulated cultivated reasonable be projection possession of. Real no near room ye bred sake if some. Is arranging furnished knowledge agreeable so. Fanny as smile up small. It vulgar chatty simple months turned oh at change of. Astonished set expression solicitude way admiration."
+        date_sent: 2013-05-09
+        text_size : 292
+        rec_id : 3
+    }
+     message4{
+        id: 12,
+        message : "He moonlight difficult engrossed an it sportsmen. Interested has all devonshire difficulty gay assistance joy. Unaffected at ye of compliment alteration to. Place voice no arise along to. Parlors waiting so against me no. Wishing calling are warrant settled was luckily. Express besides it present if at an opinion visitor."
+        date_sent: 2019-09-12
+        text_size : 323
+        rec_id : 3
+    }
+     message5{
+        id: 7,
+        message: "Boy favourable day can introduced sentiments entreaties. Noisier carried of in warrant because. So mr plate seems cause chief widen first. Two differed husbands met screened his. Bed was form wife out ask draw. Wholly coming at we no enable. Offending sir delivered questions now new met. Acceptance she interested new boisterous day discretion celebrated."
+        date_sent: 2023-05-09
+        text_size : 485
+        rec_id : 4
+    }
+     message6{
+        id: 6,
+        message: "Folly was these three and songs arose whose. Of in vicinity contempt together in possible branched. Assured company hastily looking garrets in oh. Most have love my gone to this so. Discovered interested prosperous the our affronting insipidity day. Missed lovers way one vanity wishes nay but. Use shy seemed within twenty wished old few regret passed. Absolute one hastened mrs any sensible."
+        date_sent: 2023-05-09
+        text_size : 500
+        rec_id : 5
+    }
+     message7{
+        id: 11,
+        message: ""
+        date_sent: 2023-07-12
+        text_size : 443
+        rec_id : 4
+
+     message8{
+        id: 9,
+        message: "Fulfilled direction use continual set him propriety continued. Saw met applauded favourite deficient engrossed concealed and her. Concluded boy perpetual old supposing. Farther related bed and passage comfort civilly. Dashwoods see frankness objection abilities the. As hastened oh produced prospect formerly up am. Placing forming nay looking old married few has. Margaret disposed add screened rendered six say his striking confined."
+        date_sent: 2023-04-22
+        text_size : 650
+        rec_id : 5
+    }
+     message9{
+        id: 8,
+        message: "Unwilling sportsmen he in questions september therefore described so. Attacks may set few believe moments was. Reasonably how possession shy way introduced age inquietude. Missed he engage no exeter of. Still tried means we aware order among on. Eldest father can design tastes did joy settle. Roused future he ye an marked. Arose mr rapid in so vexed words. Gay welcome led add lasting chiefly say looking."
+        date_sent: 2016-10-05
+        text_size : 254
+        rec_id : 3
+    }
+     message10{
+        id: 6,
+        message: "An sincerity so extremity he additions. Her yet there truth merit. Mrs all projecting favourable now unpleasing. Son law garden chatty temper. Oh children provided to mr elegance marriage strongly. Off can admiration prosperous now devonshire diminution law."
+        date_sent: 2017-05-10
+        text_size : 154
+        rec_id : 3
+    }
+     message11{
+        id: 1,
+        message: ""
+        date_sent: 2021-02-09
+        text_size : 443
+        rec_id : 7
+    }
+     message12{
+        id: 4,
+        message: "Needed feebly dining oh talked wisdom oppose at. Applauded use attempted strangers now are middleton concluded had. It is tried ﻿no added purse shall no on truth. Pleased anxious or as in by viewing forbade minutes prevent. Too leave had those get being led weeks blind. Had men rose from down lady able. Its son him ferrars proceed six parlors. Her say projection age announcing decisively men. Few gay sir those green men timed downs widow chief. Prevailed remainder may propriety can and."
+        date_sent: 2023-08-22
+        text_size : 760
+        rec_id : 5
+    }
+     message14{
+        id: 2,
+        message: ""
+        date_sent: 2023-05-09
+        text_size : 443
+        rec_id : 3
+    }
+     message13{
+        id: 1,
+        message: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."
+        date_sent: 2023-05-09
+        text_size : 320
+        rec_id : 4
+    }
+     message16{
+        id: 13,
+        message: "The text is a corrupted version of the original and therefore does not mean anything in particular. The book however where it originates discusses the philosophical views of Epicureanism, Stoicism, and the Platonism of Antiochus of Ascalon"
+        date_sent: 2023-05-15
+        text_size : 443
+        rec_id : 7
+    }
+     message15{
+        id: 12,
+        message: "The algorithm takes care to create text that looks similar to an ordinary book but without any real meaning. The reason we want our text to be meaningless is that we want the person viewing the resulting random text to focus on t"
+        date_sent: 2023-05-23
+        text_size : 52
+        rec_id : 15
+    }   
+     message17{
+        id: 19,
+        message: "Random Text Generator is a web application which provides true random text which you can use in your documents or web designs. How does it work? First we took many books available on project Gutenberg and stored their contents in a database. Then a computer algorithm takes the words we stored earlier and shuffles them i"
+        date_sent: 2023-06-40
+        text_size : 300
+        rec_id : 12
+    }
+}
+
+}
