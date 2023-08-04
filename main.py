@@ -1,19 +1,24 @@
-from fastapi import FastAPI ,Form , Request
+from fastapi import FastAPI ,Form , Request 
 from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
+from starlette.responses import RedirectResponse, Response
+from typing import ClassVar
+from fastapi.staticfiles import StaticFiles
 import random
 from datetime import date
+import time
 import datetime
 from typing import Optional
 from pydantic import BaseModel , Json , Field
+import ipaddress
 
 
-
-
-
-
-today = date.today()
 app = FastAPI()
+
+app.mount("/static", StaticFiles(directory="static"), name="static")
+templats = Jinja2Templates(directory="templates")
+today = date.today()
+
 todos = [
 {
     "id" : "1","activity": "jogging for two hours at a time"},{"id":"2","activity":"writing 3 pages for my college class at 3 am"}
@@ -24,75 +29,38 @@ user_data = []
 book_reviews = []
 # storing messages
 messages = []
+# models below
+class userModel(BaseModel):
+   id : int
+   name : str | None = None
+  
+   is_active : bool
+   activities : list | None = None
+    
+class post(BaseModel):
+    id : int
+    title: str
+    content : str
+    publised : bool 
+    date_of_post : date = Field(default=date.today()) # returns todays date by defualt with every post request 
+    rating: Optional[int] = None
 
-@app.get("/")
-def root():
-    return {"text": "text again","key":"value pair", "users" : 5 }
+class UserAuthentification (BaseModel):
+   
+    UserId : Optional[int] 
+    username : str
+    password : str
+    IP_address : Optional[str] = None
+UserAuthentification.count = 0
+class User(BaseModel):
+    username : str
+    password : str
 
-@app.get("/blo")
-def bl():
-    return "this is blog page"
+@app.get("/",response_class=HTMLResponse,tags=["login"])
+async def homepage(request:Request):
+    return templats.TemplateResponse("Home.html",{"request":request})
+    
 
-@app.get("/blog")
-def blog(limit=22,published:bool = True, sort: Optional[str]= None):
-    if published:
-        return {"works":["true","this worked",True], "limits":limit}
-    else:
-        return{"works": False, "limit": limit}
-
-@app.get("/random")
-async def getrandom():
-    rn: int = random.randint(0,1200)
-    return {"numeber": rn, "limit": 100}
-
-@app.get("/random/{limit}")
-async def getrandom(limit:int):
-    rn: int = random.randint(0,limit)
-    if limit == 1:
-        return 404
-    else:
-        return {"numeber": rn, "limit": limit}
-
-@app.get("/home")
-async def home():
-    return "<h1> home page for website </h1>"
-
-@app.get("/home/{id}")
-async def homepage_id(id):
-    x = today.strftime("%A, %dth of %B %Y")
-    return { "user_id ": [id,x],}
-
-# post request below 
-class Item(BaseModel):
-    name: str
-    description: str | None = None
-    price: float
-    tax: float | None = None
-
-@app.post('/blogg')
-async def create_blog(item : Item):
-    item_dic = item.dict()
-    if item.tax:
-        price_wit = item.price + item.tax
-        item_dic.update({"total price with tax ": price_wit})
-    return item_dic
-
-# put request
-@app.put("/items/{itme_id}")
-def create_put_request(item_id,item:Item):
-    ok = int(item_id)
-    return {"item_id": 2*ok}
-
-
-
-
-
-
-
-
-@app.get("/",tags=['ROOT'])
-async def root() -> dict:
-    return{"ping":"pong"}
 #get
 @app.get("/todo",tags=["todos"])
 async def get_todo() ->dict:
@@ -113,21 +81,7 @@ async def get_all_message_data():
     x = len(messages)
     return{"all messages being hosted on server currently": messages, "size" : x }
 
-class userModel(BaseModel):
-   id : int
-   name : str | None = None
-  
-   is_active : bool
-   activities : list | None = None
-    #json_data : Json[any] 
 
-class post(BaseModel):
-    id : int
-    title: str
-    content : str
-    publised : bool 
-    date_of_post : date = Field(default=date.today()) # returns todays date by defualt with every post request 
-    rating: Optional[int] = None
 
 # post request
 @app.post("/users/books",tags=["msg/prac"])
@@ -149,8 +103,7 @@ async def post_book_reviews(post_obj : post):
         return {"data was posted succesfully": True }
     else:
         return{"data was posted succesfully":False, "post ": post_obj}
-#post
-#@app.post("/")
+
 
 
 
@@ -211,17 +164,63 @@ async def delete_todos(id:int) -> dict:
 
 
 
+# works perfectly below
+@app.post("/logg",response_model=UserAuthentification,tags=["login"])
+async def create_user(request:Request,user_id: int = Form(...),
+                      username: str = Form(...),
+                      password: str = Form(...),
+                      ip_address: str = Form(None)):
+    # Create an instance of UserAuthentification with the form data
+    user_data = UserAuthentification(UserId=UserAuthentification.count, username=username, password=password, IP_address=ip_address)
+    # Increment the count of instances
+    UserAuthentification.count += 1
+    return user_data
 
 
 
-#form field
-@app.post("/login/")
-async def login(username : str = Form(...), password: str = Form(...)):
-    return {"username" : username}
 
 
-templats = Jinja2Templates(directory="templates")
 
-@app.get("/thing/{id}",response_class=HTMLResponse)
-async def read(request: Request, id: int):
-    return templats.TemplateResponse("home.html",{"request": request , "id " : id})
+@app.get("/log",tags=["login"])
+async def log(request:Request):
+    return templats.TemplateResponse("test.html",{"request": request})
+
+
+class User(BaseModel):
+    username : str
+    password : str
+
+@app.post("/loginpage/{user}",response_model=User)
+async def submit(usn:str = Form(...),pwd:str = Form(...)):
+    return User(username = usn,password=pwd)
+
+
+
+
+# move to fucntion file later 
+def isvalid(IP_address: str) -> bool:
+    try:
+        return True, ipaddress.ip_address(IP_address)
+    except ValueError:
+        print("what you entered was not a valid IP address")
+        print(ValueError)
+        return False
+
+
+@app.get("/returnIP/",tags=["IP"])
+async def return_client_IP(request : Request):
+    client_ip = request.client.host
+    if isvalid(client_ip)[0] == True:
+        return {"ip" : client_ip}
+    else:
+        return "Server error. -richard wrote this. this  should never occur if this method is written properly"
+    
+#allows user to input there own ip address
+#default ip address is the one attached to device. but they can alter it by assigning query parameters
+@app.get("/returnIP/{ipaddress}",tags=["IP"])
+async def return_client_IP(request : Request,ipaddress :Optional[str] = None):
+   if isvalid(ipaddress)[0] == True:
+       return "succsefully changed :)", {"ip":ipaddress}
+   else:
+       raise Exception
+  
