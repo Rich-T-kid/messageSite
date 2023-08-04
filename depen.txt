@@ -1,0 +1,11 @@
+pip install mysql-connector-python | sql connector
+fast api
+uvicorn
+Jinja2Templates
+pydantic
+BaseModel 
+Field
+request 
+pprint
+aiofiles
+python-multipart
