@@ -5,12 +5,12 @@ db = mysql.connector.connect(host="localhost",
                              user="root",
                              passwd="1019026",
                              database="messagesite")
-
+table = " customers"
 mycursor = db.cursor(buffered=True)
 sql_data = return_sql_data(45)
 
 def return_table():
-    mycursor.execute("select * from customers ")
+    mycursor.execute(f"select * from customers ")
     result = mycursor.fetchall()
     for row in result:
         print(row)
@@ -27,7 +27,7 @@ def get_id(id):
         print(row)
 
 def does_exist(column,valuetocheck):
-    SqlFormula = f"select count(*) From customers where {column} ={valuetocheck}"
+    SqlFormula = f"select count(*) From {table} where {column} ={valuetocheck}"
     mycursor.execute(SqlFormula)
     results = mycursor.fetchone()
 
@@ -42,17 +42,17 @@ def insert_into_table_loop(items):
         address = str(item["address"]) 
         id  =  int(item["id"])
 
-        sql_q = "INSERT INTO customers (name,address,id) VALUES (%s, %s, %s) "
+        sql_q = f"INSERT INTO {table} (name,address,id) VALUES (%s, %s, %s) "
         mycursor.execute(sql_q,(name,address,id))
         print("running")
 def updatedlog(id,colum,new_data):
-    sqlFormula = f"Select count(*) from customers where id = {id}"
+    sqlFormula = f"Select count(*) from {table} where id = {id}"
     mycursor.execute(sqlFormula)
     result = mycursor.fetchone()
     if result[0] < 0:
         return "you cannot update a log that doesnt already exist in data base"
     else:
-        sqlFormula1 = f"UPDATE customers set {colum} = {new_data} where id = {id}"
+        sqlFormula1 = f"UPDATE {table} set {colum} = {new_data} where id = {id}"
         mycursor.execute(sqlFormula1)
         db.commit()
         print("commited updates to db")
@@ -118,19 +118,3 @@ def over_xchar(colum,id):
         return f"length of your colum is {results}"
     pass
 
-#add method that retuns what ever query supplied but also limits the amount of content returned Hint: LIMIT X
-
-# add a method that orders the returned results. this will also have two options. limit the number of returns and allow what column to order the data by Hint: ORDERBY ASC DES
-# wait to use
-"""
-insert_into_table_loop(sql_data)
-return_table()
-db.commit()"""
-#add_values("richard_the_flamelord","223 newyorkwashignton ave")
-
-over_xchar("address",8)
-
-# similar syntax when finding hashes and salts in db
-"""SELECT column1, column2, ... 
-FROM table_name 
-WHERE column_name = 'exact_value';"""

@@ -1,18 +1,21 @@
 from fastapi import FastAPI ,Form , Request 
 from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
-from starlette.responses import RedirectResponse, Response
-from typing import ClassVar
+from starlette.responses import RedirectResponse, Response,HTMLResponse
+from typing import Any, ClassVar
 from fastapi.staticfiles import StaticFiles
-import random
+from Models import Identifyer,Address
+from impo_meth  import generate_password_salt , randompassword ,createRandomPassword , Hash_salt_andpassword , check_password , validLogin , return_userlocationbasedoffIP,is_ip_private
 from datetime import date
-import time
-import datetime
 from typing import Optional
-from pydantic import BaseModel , Json , Field
+from pydantic import BaseModel , Field
 import ipaddress
+from datetime import datetime
+import requests
+import time
 
-
+User_name_andpword = []
+salt_and_Hashdb = []
 app = FastAPI()
 
 app.mount("/static", StaticFiles(directory="static"), name="static")
@@ -46,20 +49,177 @@ class post(BaseModel):
     rating: Optional[int] = None
 
 class UserAuthentification (BaseModel):
+    UserId : Optional[int] = None
+    UserName : str
+    Password : str
+    IP_Adress : Optional[str] = None
    
-    UserId : Optional[int] 
-    username : str
-    password : str
-    IP_address : Optional[str] = None
-UserAuthentification.count = 0
+class MessagesClass(BaseModel):
+    Sender_id : Optional[int] = None
+    Message_ : str
+    date_Sent : str
+    textsize : int
+    Recept_id : Optional[int] = None
+    
+
+UserAuthentification.count = 0 
+
+class LoginModel(BaseModel):
+    userdata : UserAuthentification
+    login_id : int
 class User(BaseModel):
     username : str
     password : str
+# middleware logs the time it took to finish proccesing a request
+@app.middleware("http")
+async def add_proccessTime(request:Request,call_next):
+    start_time = time.time()
+    Response = await call_next(request)
+    proccess_Time = time.time() - start_time
+    Response.headers["X-Proccess-Time"] = str(proccess_Time)
+    return Response
+
+@app.middleware("http")
+async def print_consol(request:Request,call_next):
+    print(f"recived request: {request.method} {request.url}")
+    response = await call_next(request)
+    return response
+#set defualt headers for website
+@app.middleware("http")
+async def print_post(request:Request,call_next):
+    if request.method == "GET" or "POST" or "PUT" or "DELETE":
+        response = await call_next(request)
+        client_Ip = request.client.host
+        user_Origin_location= return_userlocationbasedoffIP(client_Ip)
+        pubVpriv = is_ip_private(client_Ip)
+        response.headers["X-Request-Type"] = request.method
+        response.headers["User-IP-Address"] = client_Ip
+        response.headers["Content-Language"] = "ENG"
+        if str(user_Origin_location) == "None":
+             response.headers["X-IP-Type"] = str(pubVpriv)
+             response.headers["User-origin-country"] = "your on local server it wont LOL."
+        else:
+            response.headers["User-origin-country"] = str(user_Origin_location)
+            response.headers["X-IP-Type"]  = str(pubVpriv)
+        return response
+    return await call_next(request)
+
+# keep count of get request of page visist to the home page
+count = 0
+@app.middleware("http")
+async def add_count_home(request:Request,call_next):
+    if request.method == "GET" and request.url.path == "/":
+        response = await call_next(request)
+        global count 
+        count += 1
+        print("somone has entered home page")
+        print("added to count")
+        return response 
+    return await call_next(request)
+@app.middleware("http")
+async def print_post(request:Request,call_next):
+    if request.method == "POST":
+        response = await call_next(request)
+        response.headers["X-Request-Type"] ="Post Request"
+        print("incoming Post Request")
+        return response
+    return await call_next(request)
 
 @app.get("/",response_class=HTMLResponse,tags=["login"])
 async def homepage(request:Request):
     return templats.TemplateResponse("Home.html",{"request":request})
     
+@app.post("/",tags=["login"])
+async def Login_data(request:Request,usid:int = Form(None),ussername : str = Form(...),pasw:str = Form(...)): # store data into forms
+    new_user = UserAuthentification(UserId=usid,UserName=ussername,Password=pasw) # store all that form data into an objec
+    #implement login logic here for example  checking length of strings 
+    # store the username and password 
+    if validLogin(username=new_user.UserName,password=new_user.Password) == True:
+        x = {UserAuthentification.count:new_user}
+        User_name_andpword.append(x) # add dictionary to main database in this case just a list
+        salt = generate_password_salt()
+        hashedpassword =Hash_salt_andpassword(salt=salt,password=new_user.Password)
+        salt_and_Hashdb.append({UserAuthentification.count:{"salt":salt,"hashed-password+salt":hashedpassword}})
+        UserAuthentification.count +=  1
+        return templats.TemplateResponse("Homepage.html",{"request":request})
+    else:
+        return templats.TemplateResponse("extra.html",{"request":request})
+
+@app.get("/Homepage",tags=["login"])
+async def returnHomepage(request:Request):
+    return templats.TemplateResponse("Homepage.html",{"request":request})
+
+@app.get("/all",tags=["login"])
+async def returnpasswords():
+    return salt_and_Hashdb
+
+
+@app.get("/json/{user}",tags=["login"])
+async def login_data(user: int):
+    if user < len(User_name_andpword):
+        return User_name_andpword[user]
+    else:
+        return {"message": "User not found"}
+    
+@app.get("/allusers/json",tags=["login"])
+async def AllLoginData():
+    all_objects = len(User_name_andpword)
+    return User_name_andpword,{"amount of objects": all_objects}
+class User(BaseModel):
+    username : str
+    password : str
+
+@app.post("/loginpage/{user}",response_model=User,tags=["login"])
+async def submit(usn:str = Form(...),pwd:str = Form(...)):
+    return User(username = usn,password=pwd)
+#MessagesL = [{1:[1, 'hello this is a message', '2023-09-09 12:32:15', 65, None]}, ]
+MessagesL = {}
+message_count = 0
+
+@app.get("/MessagesMain",tags=["Messages"])
+async def Return_MessageHtml(request:Request):
+    return templats.TemplateResponse("Message.html",{"request":request})
+
+@app.post("/MessagesMain",tags=["Messages"])
+async def Send_message(request:Request,sendID:int = Form(...),
+                       Message_ : str =Form(...),
+                       date_Sent:str=Form(None),
+                       textsize:int=Form(None),
+                       Recept_id:int=Form()):
+    global message_count 
+    current_time = datetime.now()
+    realuse = current_time.strftime("%Y-%m-%d %H:%M:%S")
+    tempvarsize = len(Message_)
+    NewMSg = MessagesClass(Sender_id=sendID,
+                           Message_=Message_,
+                           date_Sent=realuse,
+                           textsize=tempvarsize,
+                           Recept_id=Recept_id)
+    
+    if NewMSg.Sender_id in MessagesL:
+        MessagesL[NewMSg.Sender_id].append(NewMSg)
+    else:
+        MessagesL[NewMSg.Sender_id] = [NewMSg]
+    message_count += 1
+
+    return NewMSg
+    #return templats.TemplateResponse("temp.html",{"request":request})
+"""if tempvarsize > 5 :
+        New_Message = Messages(sendID=UserAuthentification.count,Message_=Message_,date_Sent=realuse,textsize=tempvarsize,Recept_id=None)
+       """
+
+@app.get("/allmessages",tags=["Messages"])
+async def getallmessage():
+    return MessagesL
+
+@app.get('/MsgSentby/{UserId}',tags=["Messages"])
+async def findAllmessages(UserId: int):
+    return MessagesL[UserId]
+@app.get("/message/keys",tags=["Messages"])
+async def NeverUseagain():
+    return MessagesL.keys()
+
+
 
 #get
 @app.get("/todo",tags=["todos"])
@@ -165,7 +325,7 @@ async def delete_todos(id:int) -> dict:
 
 
 # works perfectly below
-@app.post("/logg",response_model=UserAuthentification,tags=["login"])
+"""@app.post("/logg",response_model=UserAuthentification,tags=["login"])
 async def create_user(request:Request,user_id: int = Form(...),
                       username: str = Form(...),
                       password: str = Form(...),
@@ -176,23 +336,14 @@ async def create_user(request:Request,user_id: int = Form(...),
     UserAuthentification.count += 1
     return user_data
 
+"""
 
 
 
 
-
-@app.get("/log",tags=["login"])
-async def log(request:Request):
+@app.get("/log",tags=["login/2"])
+async def alternate_login_page(request:Request):
     return templats.TemplateResponse("test.html",{"request": request})
-
-
-class User(BaseModel):
-    username : str
-    password : str
-
-@app.post("/loginpage/{user}",response_model=User)
-async def submit(usn:str = Form(...),pwd:str = Form(...)):
-    return User(username = usn,password=pwd)
 
 
 
@@ -220,7 +371,10 @@ async def return_client_IP(request : Request):
 @app.get("/returnIP/{ipaddress}",tags=["IP"])
 async def return_client_IP(request : Request,ipaddress :Optional[str] = None):
    if isvalid(ipaddress)[0] == True:
-       return "succsefully changed :)", {"ip":ipaddress}
+       return "succsefully changed :)", {"ip":ipaddress},
    else:
        raise Exception
-  
+
+@app.get("/numberofvisits")
+async def returnnubmerofvisst():
+    return {"Visits since server started ": count}

@@ -79,16 +79,18 @@
     <link rel="stylesheet" type="text/css" href="/static/styles.css">
         <body>
 
-            <form>
-                <h1>Login {{ user }} </h1>
+            <form  action="/" method="post">
+                <h1>Sign Up page {{ user }} </h1>
         
                 <div class="textBoxdiv">
-                    <input type="text" placeholder="Username">
+                    <input type="text" name="ussername" placeholder="Username">
                 </div>
                 <div class="textBoxdiv">
-                    <input type="text" placeholder="password">
+                    <input type="text" name="pasw" placeholder="password">
+                    
                 </div>
-                    <input type="submit" value="login" class="loginBtn">
+                    <button type="submit" class="loginBtn" >login</button>
+                
                 <div class="signup">
                     Sign Up Below
                 </br>

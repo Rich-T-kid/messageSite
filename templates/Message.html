@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Message Form</title>
+</head>
+<body>
+    <h1>Enter Message Details</h1>
+    <form action="/MessagesMain" method="post">
+        <label for="sendID">Sender ID</label>
+        <input type="number" id="sendID" name="sendID" required><br><br>
+        
+        <label for="Recept_id">Recipient ID</label>
+        <input type="number" id="Recept_id" name="Recept_id"><br><br>
+        
+        <label for="Message_">Message</label>
+        <br>
+        <textarea id="Message_" name="Message_" rows="4" cols="50" required></textarea><br><br>
+        
+        <button type="submit" class="loginBtn">Submit</button>
+    </form>
+</body>
+</html>

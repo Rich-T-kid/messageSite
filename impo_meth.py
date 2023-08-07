@@ -1,6 +1,8 @@
 import string
 import random
 import hashlib
+import ipaddress
+from ipaddress import ip_address
 
 import time
 
@@ -51,7 +53,7 @@ def load_json_data_to_dict(file_name):
 #generates a random salt value to add with password before hashing 
 def generate_password_salt(val =None ,defualt=True) -> str:
     if defualt:
-        salt = generate_random_string(22) + str(random.randint(1,3000)) + generate_random_string(22)
+        salt = generate_random_string(30) + str(random.randint(1,3000)) + generate_random_string(30)
         return salt
     else:
         salt = generate_random_string(val) + str(random.randint(1,3000)) + generate_random_string(val)
@@ -86,16 +88,14 @@ def Hash_salt_andpassword(password : str , salt : str) -> str: # later on append
 
     return hashed_data
 
-password = "richar baah is the password"
-
-salt = "HxOyqcznDEWTJzLSoIQWEg861BjpOCdpSuZZgNzSngSiqCX"
 
 """print(type(salt),"  _  ",type(password))"""
-resulting_hash = Hash_salt_andpassword(password,salt) 
+
 # just for example sake prenetend list is mysql data base
-pas1 = "richar baah is the passwordd" # place holder for data base
+ # place holder for data base
 
 def check_password(pas,db) -> bool: # returns true or false if the password exist in database
+    salt = generate_password_salt(29)
     hash_value = Hash_salt_andpassword(pas,salt) # computes hash based on inputed password and the salt that is already stored in db that user does not know about
     for i in db: # basic for loop to check evey item in db with this hash function output
         if hash_value in db:
@@ -103,13 +103,17 @@ def check_password(pas,db) -> bool: # returns true or false if the password exis
         else:
             return False , "Incorrect password inputed try again"  
         
-stuff = []
-for i in range(5):
-    x = createRandomPassword(20)
-    y = generate_password_salt()
-    c = Hash_salt_andpassword(x,y)
-    stuff.append(c)
+def validLogin(username:str , password:str) -> bool:
+    return True
+# actually validate and implement later
+import requests
+def return_userlocationbasedoffIP(IP):
+    Ip_api_key = "9a640087f1ee2d7da2b31c5d918c939c"
+    site_ulr = "http://api.ipstack.com/"
+    user_IP = str(IP)
+    response = requests.get(f"http://api.ipstack.com/{user_IP}?access_key={Ip_api_key}")
+    object_countryname = response.json()["country_name"]
+    return object_countryname
 
-print(stuff)
-
-print(check_password("0efbb14d5bb714c824b08575afacf55ee30a5857",stuff))# works but wont work now because the current list is being reiterated with evey run of program
+def is_ip_private(IP): # retuns if inputed ip address is public or private
+    return "Private" if (ip_address(IP).is_private) else "Public"
